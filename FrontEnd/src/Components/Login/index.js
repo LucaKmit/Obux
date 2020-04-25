@@ -7,21 +7,26 @@ import logo from '../../assets/LOGO.png';
 
 import { Container } from './styles';
 
-export default function Login() {
+export default function Login({ navigation }) {
+  const handleRegisterClick = () => {
+    navigation.navigate('Register');
+  };
+
   return (
     <Container>
+      
       <Image 
         source={ logo }
         style={{ width: 200, height: 200}}
       />
       <Input placeholder='E-mail' />
-      <Input placeholder='Senha' />
+      <Input placeholder='Senha' secureTextEntry={true}/>
       <Text>{'\n'}</Text>
       <Button title='                  Logar                  ' />
       <Text>{'\n'}</Text>
       <Hr lineColor="white" width={1} text="Não tem uma conta?" textStyles={{ color: 'white' }} />
       <Text>{'\n'}</Text>
-      <Button title='      Registre-se Agora      ' />
+      <Button title='      Registre-se Agora      '  onPress={handleRegisterClick}/>
     </Container>
 
   );
