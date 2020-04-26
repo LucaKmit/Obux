@@ -1,32 +1,31 @@
 import React from 'react';
-import { Text, Image, Button } from 'react-native';
+import { Image } from 'react-native';
 import Hr from "react-native-hr-component";
-import { Input } from 'react-native-elements';
+
+import Button from '../Button';
+import Input from '../Input';
 
 import logo from '../../assets/LOGO.png';
 
-import { Container } from './styles';
+import { Container, Form } from './styles';
 
 export default function Login({ navigation }) {
   const handleRegisterClick = () => {
     navigation.navigate('Register');
   };
-
   return (
     <Container>
-      
-      <Image 
-        source={ logo }
-        style={{ width: 200, height: 200}}
-      />
-      <Input placeholder='E-mail' />
-      <Input placeholder='Senha' secureTextEntry={true}/>
-      <Text>{'\n'}</Text>
-      <Button title='                  Logar                  ' />
-      <Text>{'\n'}</Text>
-      <Hr lineColor="white" width={1} text="Não tem uma conta?" textStyles={{ color: 'white' }} />
-      <Text>{'\n'}</Text>
-      <Button title='      Registre-se Agora      '  onPress={handleRegisterClick}/>
+      <Form>
+        <Image 
+          source={ logo }
+          style={{ width: 200, height: 200}}
+        />
+        <Input placeholder='E-mail' placeholderTextColor="white" />
+        <Input placeholder='Senha' secureTextEntry={true} placeholderTextColor="white" />
+        <Button marginY={20} color="blue" width={200} height={40} >Logar</Button>
+        <Hr lineColor="white" width={1} text="Não possui uma conta?" textStyles={{ color: "white" }} />
+        <Button marginY={20} color="blue" width={200} height={40} onPress={handleRegisterClick} >Registrar</Button>
+      </Form>
     </Container>
 
   );
