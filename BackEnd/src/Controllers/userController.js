@@ -19,8 +19,11 @@ module.exports = {
 
             if(!user) {
                 const salt =  bcrypt.genSaltSync(parseInt(20));
+
                 const encyptedPassword = bcrypt.hashSync(senha, salt);
-                const created_user = await userSchema.create({ nome, data_nasc, telefone, email, cpf, senha:encyptedPassword , cidade, estado });
+                const encyptedCPF = bcrypt.hashSync(cpf, salt);
+
+                const created_user = await userSchema.create({ nome, data_nasc, telefone, email, cpf:encyptedCPF, senha:encyptedPassword , cidade, estado });
                 return res.json(created_user);
             } else {
                 return res.send('User already exists');
