@@ -12,13 +12,15 @@ const userSchema = mongoose.Schema({
     telefone: String,
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     cpf: {
         type: String,
         required: true,
         max: 14,
-        select: false
+        select: true,
+        unique: true
     },
     senha: {
         type: String,

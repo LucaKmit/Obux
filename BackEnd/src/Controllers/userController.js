@@ -1,6 +1,10 @@
 const userSchema = require('../Models/userModel');
 
+const CPF = require('cpf-check');
+
 const bcrypt = require('bcrypt');
+
+const md5 = require('md5');
 
 module.exports = {
     async getUser(req, res) {
@@ -15,17 +19,21 @@ module.exports = {
         try {
             const { nome, data_nasc, telefone, email, cpf, senha, cidade, estado } = req.body;
 
-            const user = await userSchema.findOne({ cpf, email });
+            const salt = bcrypt.genSaltSync(10);
+            const encryptedCPF = md5(cpf);
+
+            const user = await userSchema.findOne({ $or: [{ email }, { cpf: encryptedCPF }] }).select('+cpf').exec();
 
             if(!user) {
-                const salt = bcrypt.genSaltSync(10);
-                
                 const encyptedPassword = bcrypt.hashSync(senha, salt);
 
-                const encyptedCPF = bcrypt.hashSync(cpf, salt);
+                if(CPF.validate(cpf)) {
+                    const created_user = await userSchema.create({ nome, data_nasc, telefone, email, cpf: encryptedCPF, senha:encyptedPassword , cidade, estado }); 
+                    return res.json(created_user);
+                } else {
+                    return res.send('CPF not valid');
+                }
 
-                const created_user = await userSchema.create({ nome, data_nasc, telefone, email, cpf:encyptedCPF, senha:encyptedPassword , cidade, estado });
-                return res.json(created_user);
             } else {
                 return res.send('User already exists');
             }
