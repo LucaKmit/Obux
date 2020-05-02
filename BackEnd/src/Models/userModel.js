@@ -15,8 +15,9 @@ const userSchema = mongoose.Schema({
         required: true
     },
     cpf: {
-        type: Number,
+        type: String,
         required: true,
+        max: 14,
         select: false
     },
     senha: {
