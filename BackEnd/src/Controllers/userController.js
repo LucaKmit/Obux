@@ -18,9 +18,10 @@ module.exports = {
             const user = await userSchema.findOne({ cpf, email });
 
             if(!user) {
-                const salt =  bcrypt.genSaltSync(parseInt(20));
-
+                const salt = bcrypt.genSaltSync(10);
+                
                 const encyptedPassword = bcrypt.hashSync(senha, salt);
+
                 const encyptedCPF = bcrypt.hashSync(cpf, salt);
 
                 const created_user = await userSchema.create({ nome, data_nasc, telefone, email, cpf:encyptedCPF, senha:encyptedPassword , cidade, estado });
@@ -46,6 +47,8 @@ module.exports = {
             } else {
                 return res.status(400).send("Incorrect Email or Password");
             }
+        } else {
+            return res.send('User does not exists');
         }
 
     }
