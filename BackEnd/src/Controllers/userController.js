@@ -1,89 +1,96 @@
-const userSchema = require('../Models/userModel');
-
-const CPF = require('cpf-check');
-const bcrypt = require('bcrypt');
 const md5 = require('md5');
-const sharp = require('sharp');
+const bcrypt = require('bcrypt');
+const CPF = require('cpf-check');
 const path = require('path');
 const fs = require('fs');
 
+const { moreThan18Years } = require('../Utils/date');
+
+const userSchema = require('../Models/userModel');
+
+const verify = (user, cpf, dataNasc) => {
+  if (user) {
+    return 'User already exists';
+  }
+
+  if (!CPF.validate(cpf)) {
+    return 'CPF not valid';
+  }
+
+  if (!moreThan18Years(new Date(dataNasc))) {
+    return 'You are under 18';
+  }
+
+  return false;
+};
+
 module.exports = {
-    async getUser(req, res) {
-        const { id } = req.params.id;
-        
-        const user = await userSchema.findOne({ id });
+  async getUser(req, res) {
+    const { id } = req.params.id;
 
-        res.send({ user });
-    },
+    const user = await userSchema.findOne({ id });
 
-    async createUser(req, res) {
-        function moreThan18Years(birth) {
-            const date18years = new Date().setFullYear(new Date().getFullYear() -18);
-            return birth <= date18years;
-        }
+    return user ? res.send({ user }) : res.status(404).send({});
+  },
 
-        try {
-            const { nome, data_nasc, telefone, email, cpf, senha, cidade, estado } = req.body;
+  async createUser(req, res) {
+    try {
+      const {
+        nome, dataNasc, telefone, email, cpf, senha, cidade, estado,
+      } = req.body;
 
-            const salt = bcrypt.genSaltSync(10);
-            const encryptedCPF = md5(cpf);
+      const salt = bcrypt.genSaltSync(10);
+      const encryptedCPF = md5(cpf);
 
-            const user = await userSchema.findOne({ $or: [{ email }, { cpf: encryptedCPF }] }).select('+cpf').exec();
+      const user = await userSchema.findOne({
+        $or: [
+          { email },
+          { cpf: encryptedCPF },
+        ],
+      }).select('+cpf').exec();
 
-            const {filename: pfp} = req.file;
+      const userVerify = verify(user, cpf, dataNasc);
 
-            const [name, extension] = pfp.split('.');
-            const fileName = `${name}.jpg`;
-            
-            await sharp(req.file.path)
-            .resize(500)
-            .jpeg({ quality: 72 })
-            .toFile(
-                path.resolve(req.file.destination, 'resized', fileName)
-            );
+      if (userVerify) {
+        const filePath = path.resolve(__dirname, '..', '..', 'uploads', req.file.filename);
+        fs.unlinkSync(filePath);
+        return res.send(userVerify);
+      }
 
-            fs.unlinkSync(req.file.path);
+      const encyptedPassword = bcrypt.hashSync(senha, salt);
 
-            if(!user) {
-                const encyptedPassword = bcrypt.hashSync(senha, salt);
-
-                if(CPF.validate(cpf)) {
-                    if(moreThan18Years(data_nasc)) {
-                        const created_user = await userSchema.create({ nome, data_nasc, telefone, email, cpf: encryptedCPF, senha:encyptedPassword , cidade, estado, pfp: fileName }); 
-                        return res.json(created_user);
-                    } else {
-                        console.log(moreThan18Years(data_nasc));
-                        return res.send('You are under 18');
-                    }
-                } else {
-                    return res.send('CPF not valid');
-                }
-
-            } else {
-                return res.send('User already exists');
-            }
-        } catch (e) {
-            console.log(e);
-        }
-
-    },
-
-    async login(req, res) {
-        const { email, senha } = req.body;
-
-        const user = await userSchema.findOne({ email }).select(['+senha']);
-
-        if(user) {
-            if(bcrypt.compareSync(senha, user.senha)) {
-                user.senha = undefined;
-                return res.send({ user });
-            } else {
-                return res.status(400).send("Incorrect Email or Password");
-            }
-        } else {
-            return res.send('User does not exists');
-        }
-
+      const fileName = `http://localhost:3000/files/${req.file.filename}`;
+      const createdUser = await userSchema.create({
+        nome,
+        dataNasc,
+        telefone,
+        email,
+        cpf: encryptedCPF,
+        senha: encyptedPassword,
+        cidade,
+        estado,
+        pfp: fileName,
+      });
+      return res.json(createdUser);
+    } catch (e) {
+      console.log(e);
+      return res.status(500).send('Error');
     }
+  },
 
-}
+  async login(req, res) {
+    const { email, senha } = req.body;
+
+    const user = await userSchema.findOne({ email }).select(['+senha']);
+
+    if (user) {
+      if (bcrypt.compareSync(senha, user.senha)) {
+        user.senha = undefined;
+        return res.send({ user });
+      }
+      return res.status(400).send('Incorrect Email or Password');
+    }
+    return res.send('User does not exists');
+  },
+
+};
