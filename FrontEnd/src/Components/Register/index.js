@@ -29,9 +29,9 @@ export default function Register({ navigation }) {
         <Input icon="account" iconColor="#fff" placeholder='UserName' placeholderTextColor="white" />
         <Input icon="email" iconColor="#fff" placeholder='E-mail' placeholderTextColor="white" />
         <Input icon="lock" iconColor="#fff" placeholder='Senha' secureTextEntry={true} placeholderTextColor="white" />
-        <Input icon="lock-alert" iconColor="#fff" placeholder='Confirme a Sua Senha' secureTextEntry={true} placeholderTextColor="white" />
+        <Input icon="lock-alert" iconColor="#fff" placeholder='Confirmar Senha' secureTextEntry={true} placeholderTextColor="white" />
         <Input icon="account-card-details" iconColor="#fff" placeholder='CPF' placeholderTextColor="white" />
-        <Input icon="calendar" iconColor="#fff" placeholder='Data Do Nascimento'placeholderTextColor="white"  />
+        <Input icon="calendar" iconColor="#fff" placeholder='Data de Nascimento'placeholderTextColor="white"  />
         <Input icon="cellphone" iconColor="#fff" placeholder='Telefone' placeholderTextColor="white" />
         
         <Row>
