@@ -6,7 +6,7 @@ const userSchema = mongoose.Schema({
         required: true
     },
     data_nasc: {
-        type: String,
+        type: Date,
         required: true
     },
     telefone: String,
@@ -35,7 +35,8 @@ const userSchema = mongoose.Schema({
         required: true,
         type: String,
         max: 2
-    }
+    },
+    pfp: String
 });
 
 module.exports = mongoose.model('User', userSchema);

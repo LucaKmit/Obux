@@ -1,10 +1,11 @@
 const userSchema = require('../Models/userModel');
 
 const CPF = require('cpf-check');
-
 const bcrypt = require('bcrypt');
-
 const md5 = require('md5');
+const sharp = require('sharp');
+const path = require('path');
+const fs = require('fs');
 
 module.exports = {
     async getUser(req, res) {
@@ -16,6 +17,11 @@ module.exports = {
     },
 
     async createUser(req, res) {
+        function moreThan18Years(birth) {
+            const date18years = new Date().setFullYear(new Date().getFullYear() -18);
+            return birth <= date18years;
+        }
+
         try {
             const { nome, data_nasc, telefone, email, cpf, senha, cidade, estado } = req.body;
 
@@ -24,12 +30,31 @@ module.exports = {
 
             const user = await userSchema.findOne({ $or: [{ email }, { cpf: encryptedCPF }] }).select('+cpf').exec();
 
+            const {filename: pfp} = req.file;
+
+            const [name, extension] = pfp.split('.');
+            const fileName = `${name}.jpg`;
+            
+            await sharp(req.file.path)
+            .resize(500)
+            .jpeg({ quality: 72 })
+            .toFile(
+                path.resolve(req.file.destination, 'resized', fileName)
+            );
+
+            fs.unlinkSync(req.file.path);
+
             if(!user) {
                 const encyptedPassword = bcrypt.hashSync(senha, salt);
 
                 if(CPF.validate(cpf)) {
-                    const created_user = await userSchema.create({ nome, data_nasc, telefone, email, cpf: encryptedCPF, senha:encyptedPassword , cidade, estado }); 
-                    return res.json(created_user);
+                    if(moreThan18Years(data_nasc)) {
+                        const created_user = await userSchema.create({ nome, data_nasc, telefone, email, cpf: encryptedCPF, senha:encyptedPassword , cidade, estado, pfp: fileName }); 
+                        return res.json(created_user);
+                    } else {
+                        console.log(moreThan18Years(data_nasc));
+                        return res.send('You are under 18');
+                    }
                 } else {
                     return res.send('CPF not valid');
                 }
