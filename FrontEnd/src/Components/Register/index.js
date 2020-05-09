@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Image, TouchableOpacity } from 'react-native';
+import { Text, Image, TouchableOpacity, Alert } from 'react-native';
 
 //import logo from '../../assets/LOGO.png';
 import addPfpIcon from '../../assets/add_pfp.png';
@@ -14,7 +14,10 @@ import {Form, Row, Column} from './styles';
 
 export default function Register({navigation}) {
   const handleLoginClick = () => {
-    navigation.navigate('Login');
+    Alert.alert('Conta criada com sucesso', 'Sua conta foi criada, basta fazer o login', [
+      { text: "OK", onPress: () => navigation.navigate('Login') }
+      ],
+      { cancelable: true });
   };
 
   const addPfP = () => {
