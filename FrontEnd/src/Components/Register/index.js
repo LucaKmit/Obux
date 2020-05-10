@@ -22,14 +22,16 @@ export default function Register({navigation}) {
 
   const addPfP = () => {
     const options = {
-      title: 'Select Avatar',
-      customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+      title: 'Selecionar foto de perfil',
+      takePhotoButtonTitle: 'Tirar foto...',
+      mediaType: 'photo',
+      chooseFromLibraryButtonTitle: 'Escolher da galeria...',
       storageOptions: {
         skipBackup: true,
         path: 'images',
       },
     };
-    ImagePicker.launchImageLibrary(options, response=> {
+    ImagePicker.showImagePicker(options, response=> {
       console.log('response', response);
     })
   };
