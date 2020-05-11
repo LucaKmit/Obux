@@ -8,6 +8,7 @@ const multer = require('multer');
 const { createUserMulterConfig } = require('./Config/multer');
 
 const userController = require('./Controllers/userController');
+const bookController = require('./Controllers/bookController');
 
 routes.post('/createuser', multer(createUserMulterConfig).single('pfp'), userController.createUser);
 routes.get('/getuser/:id', userController.getUser);
@@ -22,5 +23,9 @@ routes.get('/files/:fileName', (req, res) => {
     }
   });
 });
+
+routes.get('/getbook/:id', bookController.getBook);
+
+routes.post('/registerbook', userController.registerBook);
 
 module.exports = routes;

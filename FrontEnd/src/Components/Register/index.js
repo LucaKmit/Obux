@@ -25,6 +25,7 @@ export default function Register({navigation}) {
       title: 'Selecionar foto de perfil',
       takePhotoButtonTitle: 'Tirar foto...',
       mediaType: 'photo',
+      allowsEditing: true,
       chooseFromLibraryButtonTitle: 'Escolher da galeria...',
       storageOptions: {
         skipBackup: true,

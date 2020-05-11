@@ -6,6 +6,7 @@ const fs = require('fs');
 
 const { moreThan18Years } = require('../Utils/date');
 
+const bookSchema = require('../Models/booksSchema');
 const userSchema = require('../Models/userModel');
 
 const verify = (user, cpf, dataNasc) => {
@@ -92,5 +93,21 @@ module.exports = {
     }
     return res.send('User does not exists');
   },
+
+  async registerBook(req, res) {
+    const { email, biblioteca } = req.body;
+
+    const { titulo, qualidade, disponibilidade } = req.body;
+    const book = await bookSchema.findOne({ titulo });
+
+    if(!book) {
+      const createBook = await bookSchema.create({ titulo, qualidade, disponibilidade });
+      
+      const createdBook = await userSchema.findOneAndUpdate({ email, $push: { biblioteca: createBook } });
+      
+      console.log(createdBook);
+      res.send(createdBook);
+    }
+  }
 
 };
