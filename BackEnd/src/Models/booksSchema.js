@@ -5,6 +5,9 @@ const booksSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  autor: String,
+  ano: String,
+  genero: String,
   qualidade: { 
     type: String,
     required: true

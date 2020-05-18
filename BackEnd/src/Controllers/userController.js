@@ -36,9 +36,7 @@ module.exports = {
 
   async createUser(req, res) {
     try {
-      const {
-        nome, dataNasc, telefone, email, cpf, senha, cidade, estado,
-      } = req.body;
+      const { nome, dataNasc, telefone, email, cpf, senha, cidade, estado, } = req.body;
 
       const salt = bcrypt.genSaltSync(10);
       const encryptedCPF = md5(cpf);
@@ -100,14 +98,30 @@ module.exports = {
     const { titulo, qualidade, disponibilidade } = req.body;
     const book = await bookSchema.findOne({ titulo });
 
+    const filePath = path.resolve(__dirname, '..', '..', 'uploads', req.file.filename);
+    fs.unlinkSync(filePath);
+    const fileName = `http://localhost:3000/files/${req.file.filename}`;
+
     if(!book) {
-      const createBook = await bookSchema.create({ titulo, qualidade, disponibilidade });
+      const createBook = await bookSchema.create({ titulo, qualidade, disponibilidade, foto: fileName });
       
       const createdBook = await userSchema.findOneAndUpdate({ email, $push: { biblioteca: createBook } });
       
       console.log(createdBook);
       res.send(createdBook);
     }
+  },
+
+  async updateUser(req, res) {
+    const { email, nome, senha, cidade, estado } = req.body;
+  },
+
+  async delUser(req, res) {
+    const { id } = req.params.id;
+
+    const user = await userSchema.findByIdAndDelete(id);
+
+    res.send('User Deleted');
   }
 
 };
