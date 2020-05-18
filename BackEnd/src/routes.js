@@ -15,6 +15,7 @@ routes.get('/getuser/:id', userController.getUser);
 routes.post('/login', userController.login);
 routes.delete('/deluser:id', userController.delUser);
 routes.put('/updateuser:id', userController.updateUser);
+routes.post('/rateuser', userController.rateUser);
 routes.get('/files/:fileName', (req, res) => {
   const { fileName } = req.params;
 
