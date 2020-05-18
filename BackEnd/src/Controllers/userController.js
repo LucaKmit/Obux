@@ -122,6 +122,13 @@ module.exports = {
     const user = await userSchema.findByIdAndDelete(id);
 
     res.send('User Deleted');
+  },
+
+  async rateUser(req, res) {
+    const { stars } = req.body;
+    const rate = stars += 1;
+    const userRate = await userSchema.findOneAndUpdate({ stars: rate });
+    res.send({ 'stars': userRate })
   }
 
 };

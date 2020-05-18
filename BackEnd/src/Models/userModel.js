@@ -42,6 +42,7 @@ const userSchema = mongoose.Schema({
     ref: 'Books',
   },
   pfp: String,
+  stars: Number
 });
 
 module.exports = mongoose.model('User', userSchema);
